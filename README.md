@@ -1,12 +1,21 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<img width="260" alt="AJStudiozLogo" src="https://z-cdn-media.chatglm.cn/files/22e406bf-d9da-46b0-b116-686dd8628a3c.png?auth_key=1864866313-6644253785834aae9f36529c0b483d71-0-57ffec399a7d44d551df1343784df05f" />
 </div>
 
-# Run and deploy your AI Studio app
+<h1 align="center">Agri AI</h1>
+<p align="center"><strong>Developed by AJ STUDIOZ INTERNAL AI</strong></p>
 
-This contains everything you need to run your app locally.
+This repository contains everything required to run the Agri AI application locally.  
 
-View your app in AI Studio: https://ai.studio/apps/drive/1DM7fNZlo08voWE_aGbWMg8xW-0dsD6ui
+---
+
+## Run Locally
+
+**Prerequisites:** Node.js
+
+### 1. Install dependencies
+```bash
+npm install
 
 ## Run Locally
 
