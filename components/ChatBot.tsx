@@ -4,6 +4,7 @@ import { ChatMessage, PlantAnalysis, Language } from '../types';
 import { chatWithAgriBot } from '../services/geminiService';
 import ReactMarkdown from 'react-markdown';
 import { getTranslation } from '../utils/translations';
+import { AIInput } from './ui/ai-input';
 
 interface ChatBotProps {
   analysisContext: PlantAnalysis | null;
@@ -15,7 +16,6 @@ export const ChatBot: React.FC<ChatBotProps> = ({ analysisContext, lang }) => {
   const t = (key: string) => getTranslation(lang, key);
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -42,22 +42,21 @@ export const ChatBot: React.FC<ChatBotProps> = ({ analysisContext, lang }) => {
     scrollToBottom();
   }, [messages, isOpen]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (message: string) => {
+    if (!message.trim()) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      text: input,
+      text: message,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMsg]);
-    setInput('');
     setIsTyping(true);
 
     try {
-      const responseText = await chatWithAgriBot(messages, input, lang, analysisContext || undefined);
+      const responseText = await chatWithAgriBot(messages, message, lang, analysisContext || undefined);
       
       const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -73,9 +72,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ analysisContext, lang }) => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSend();
-  };
+
 
   return (
     <>
@@ -140,24 +137,14 @@ export const ChatBot: React.FC<ChatBotProps> = ({ analysisContext, lang }) => {
         </div>
 
         {/* Input */}
-        <div className="p-3 border-t border-cement-100 bg-white rounded-b-2xl">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder={t('chatPlaceholder')}
-              className="flex-1 bg-cement-50 border border-cement-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-cement-800"
-            />
-            <button 
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className="p-2 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </div>
+        <div className="border-t border-cement-100 bg-white rounded-b-2xl">
+          <AIInput
+            placeholder={t('chatPlaceholder')}
+            onSubmit={handleSend}
+            className="p-0"
+            minHeight={44}
+            maxHeight={120}
+          />
         </div>
       </div>
     </>

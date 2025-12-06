@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: ["class"],
         theme: {
           extend: {
             colors: {
@@ -23,9 +24,45 @@
                 800: '#1f2937',
                 900: '#111827',
               },
+              border: "hsl(214.3, 31.8%, 91.4%)",
+              input: "hsl(214.3, 31.8%, 91.4%)",
+              ring: "hsl(142.1, 76.2%, 36.3%)",
+              background: "hsl(0, 0%, 100%)",
+              foreground: "hsl(222.2, 84%, 4.9%)",
+              primary: {
+                DEFAULT: "hsl(142.1, 76.2%, 36.3%)",
+                foreground: "hsl(355.7, 100%, 97.3%)",
+              },
+              secondary: {
+                DEFAULT: "hsl(210, 40%, 98%)",
+                foreground: "hsl(222.2, 84%, 4.9%)",
+              },
+              muted: {
+                DEFAULT: "hsl(210, 40%, 98%)",
+                foreground: "hsl(215.4, 16.3%, 46.9%)",
+              },
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+            },
+            borderRadius: {
+              lg: "0.75rem",
+              md: "calc(0.75rem - 2px)",
+              sm: "calc(0.75rem - 4px)",
+            },
+            keyframes: {
+              "accordion-down": {
+                from: { height: "0" },
+                to: { height: "var(--radix-accordion-content-height)" },
+              },
+              "accordion-up": {
+                from: { height: "var(--radix-accordion-content-height)" },
+                to: { height: "0" },
+              },
+            },
+            animation: {
+              "accordion-down": "accordion-down 0.2s ease-out",
+              "accordion-up": "accordion-up 0.2s ease-out",
             },
           },
         },
@@ -41,9 +78,60 @@
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
     <style>
+      :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 142.1 76.2% 36.3%;
+        --primary-foreground: 355.7 100% 97.3%;
+        --secondary: 210 40% 98%;
+        --secondary-foreground: 222.2 84% 4.9%;
+        --muted: 210 40% 98%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 98%;
+        --accent-foreground: 222.2 84% 4.9%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 142.1 76.2% 36.3%;
+        --radius: 0.75rem;
+      }
+
+      .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+        --card: 222.2 84% 4.9%;
+        --card-foreground: 210 40% 98%;
+        --popover: 222.2 84% 4.9%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 142.1 70.6% 45.3%;
+        --primary-foreground: 144.9 80.4% 10%;
+        --secondary: 217.2 32.6% 17.5%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 217.2 32.6% 17.5%;
+        --muted-foreground: 215 20.2% 65.1%;
+        --accent: 217.2 32.6% 17.5%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 17.5%;
+        --ring: 142.4 71.8% 29.2%;
+      }
+
+      * {
+        border-color: hsl(var(--border));
+      }
+
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #ffffff;
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        font-feature-settings: "rlig" 1, "calt" 1;
       }
       /* Custom Scrollbar for a cleaner look */
       ::-webkit-scrollbar {
@@ -58,6 +146,20 @@
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #9ca3af; 
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
       }
     </style>
   <script type="importmap">
