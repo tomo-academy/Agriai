@@ -89,9 +89,11 @@ export const ChatBot: React.FC<ChatBotProps> = ({ analysisContext, lang }) => {
         {/* Header */}
         <div className="bg-green-600 p-4 rounded-t-2xl flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="bg-white/20 p-1.5 rounded-full">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
+            <img 
+              src="/1000098217.png" 
+              alt="AgriVision AI" 
+              className="w-7 h-7 rounded-lg bg-white/10 p-0.5"
+            />
             <div>
               <h3 className="font-bold text-white text-sm">{t('chatTitle')}</h3>
               <p className="text-green-100 text-xs flex items-center gap-1">

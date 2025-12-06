@@ -25,9 +25,11 @@ export const Header: React.FC<HeaderProps> = ({ currentLang, onLangChange }) => 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
-            <div className="bg-green-600 p-1.5 rounded-lg">
-              <Leaf className="w-6 h-6 text-white" />
-            </div>
+            <img 
+              src="/1000098217.png" 
+              alt="AgriVision AI Logo" 
+              className="w-8 h-8 rounded-lg"
+            />
             <span className="text-xl font-bold text-cement-900 tracking-tight">{t('appTitle')}<span className="text-green-600">.AI</span></span>
           </div>
           
