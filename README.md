@@ -19,11 +19,31 @@ npm install
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:** Node.js
 
+### Setup Instructions
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Set up environment variables:**
+   - Copy `.env.example` to `.env.local`
+   - Get your Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Get your Mapbox API key from [Mapbox](https://account.mapbox.com/access-tokens/)
+   - Add both keys to your `.env.local` file
+
+3. **Run the app:**
+   ```bash
+   npm run dev
+   ```
+
+## Features
+
+- **AI Plant Analysis:** Upload plant images for disease detection and treatment recommendations
+- **Interactive Maps:** Select land areas with Mapbox integration for detailed agricultural analysis
+- **Multi-language Support:** Available in English, Hindi, Punjabi, Tamil, Telugu, and Marathi
+- **Weather Integration:** Real-time agricultural weather data
+- **Smart Chatbot:** AI-powered agricultural advisor with enhanced input experience
+- **Land Analysis:** Draw and analyze specific land areas for soil, climate, and agricultural potential

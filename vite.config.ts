@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       // This ensures process.env.API_KEY works in the browser code
-      'process.env.API_KEY': JSON.stringify(env.API_KEY)
+      'process.env.API_KEY': JSON.stringify(env.VITE_API_KEY || env.API_KEY)
     },
     build: {
       outDir: 'dist',

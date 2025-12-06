@@ -63,4 +63,6 @@ export interface RegionAnalysis {
   climateSuitability: string;
   waterSources: string;
   overallRating: 'Excellent' | 'Good' | 'Average' | 'Poor';
+  areaSize?: string;
+  coordinates?: string;
 }

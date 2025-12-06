@@ -137,13 +137,13 @@ export const ChatBot: React.FC<ChatBotProps> = ({ analysisContext, lang }) => {
         </div>
 
         {/* Input */}
-        <div className="border-t border-cement-100 bg-white rounded-b-2xl">
+        <div className="border-t border-cement-100 bg-white rounded-b-2xl px-2 py-1">
           <AIInput
             placeholder={t('chatPlaceholder')}
             onSubmit={handleSend}
-            className="p-0"
-            minHeight={44}
-            maxHeight={120}
+            className="py-0"
+            minHeight={40}
+            maxHeight={100}
           />
         </div>
       </div>

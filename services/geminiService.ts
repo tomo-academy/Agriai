@@ -151,14 +151,23 @@ export const generateFeatureReport = async (featureId: string, context: { plant?
   }
 };
 
-export const analyzeRegion = async (lat: number, lon: number, lang: Language): Promise<RegionAnalysis> => {
+export const analyzeRegion = async (lat: number, lon: number, lang: Language, areaData?: any): Promise<RegionAnalysis> => {
   try {
+    let analysisPrompt = `Analyze the agricultural potential for the coordinates ${lat}, ${lon} in ${lang} language.`;
+    
+    if (areaData) {
+      // Calculate area if provided (this will be done in the calling component)
+      analysisPrompt += ` This is a selected land area for detailed agricultural analysis.`;
+    }
+    
+    analysisPrompt += ` Provide detailed analysis on: 1. Soil potential and characteristics for this specific region 2. Climate suitability for various crops 3. Water sources and irrigation potential 4. Overall agricultural rating with specific recommendations.`;
+
     const response = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
       contents: {
         parts: [
           {
-            text: `Analyze the agricultural potential for the coordinates ${lat}, ${lon} in ${lang} language. 1. Describe soil potential (assume typical soil for this region). 2. Climate suitability. 3. Water availability. 4. Give overall rating.`
+            text: analysisPrompt
           }
         ]
       },

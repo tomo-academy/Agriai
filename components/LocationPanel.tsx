@@ -2,11 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { WeatherData, RegionAnalysis, Language } from '../types';
 import { fetchLocalWeather, getWeatherDescription } from '../services/weatherService';
 import { analyzeRegion } from '../services/geminiService';
-import { CloudRain, Sun, Droplets, MapPin, AlertTriangle, Loader2, Moon, CloudFog, CloudLightning, Snowflake, Satellite, Locate } from 'lucide-react';
+import { CloudRain, Sun, Droplets, MapPin, AlertTriangle, Loader2, Moon, CloudFog, CloudLightning, Snowflake, Satellite, Locate, Square, Trash2 } from 'lucide-react';
 import { getTranslation } from '../utils/translations';
+import mapboxgl from 'mapbox-gl';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import * as turf from '@turf/turf';
 
-// Declare L for Leaflet as it is loaded via script tag
-declare const L: any;
+// Set your Mapbox access token here
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY || 'pk.eyJ1IjoidG9tby1hY2FkZW15IiwiYSI6ImNtNDJhdGIyajByeGsya3M2NjZjNDl5a2sifQ.X1YgKzVZQJwDfvGdUVWGwQ';
 
 interface LocationPanelProps {
   lang: Language;
@@ -21,9 +24,12 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
   // Region Analysis State
   const [analyzingRegion, setAnalyzingRegion] = useState(false);
   const [regionData, setRegionData] = useState<RegionAnalysis | null>(null);
+  const [selectedArea, setSelectedArea] = useState<any>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
+  const drawRef = useRef<MapboxDraw | null>(null);
 
   const t = (key: string) => getTranslation(lang, key);
 
@@ -56,40 +62,186 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
     }
   }, []);
 
-  // Initialize Map
+  // Initialize Mapbox Map
   useEffect(() => {
-    if (coords && mapContainerRef.current && !mapInstanceRef.current && typeof L !== 'undefined') {
-      mapInstanceRef.current = L.map(mapContainerRef.current).setView([coords.lat, coords.lon], 13);
+    if (coords && mapContainerRef.current && !mapInstanceRef.current) {
+      const map = new mapboxgl.Map({
+        container: mapContainerRef.current,
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
+        center: [coords.lon, coords.lat],
+        zoom: 14,
+        attributionControl: false
+      });
 
-      // Using CartoDB Voyager tiles for a clean, premium "Mapbox-like" look without API keys
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-      }).addTo(mapInstanceRef.current);
-
-      L.marker([coords.lat, coords.lon]).addTo(mapInstanceRef.current)
-        .bindPopup('Your Farm Location')
-        .openPopup();
+      // Add navigation control
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right');
       
-      // Fix for map rendering issues in some containers
-      setTimeout(() => {
-        mapInstanceRef.current?.invalidateSize();
-      }, 100);
+      // Add layer style control
+      map.on('load', () => {
+        map.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          'tileSize': 512,
+          'maxzoom': 14
+        });
+        // Add the DEM source as a terrain layer with exaggerated height
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+      });
+
+      // Add current location marker
+      new mapboxgl.Marker({ color: '#16a34a' })
+        .setLngLat([coords.lon, coords.lat])
+        .setPopup(new mapboxgl.Popup().setHTML('<strong>Your Current Location</strong>'))
+        .addTo(map);
+
+      // Initialize drawing tools
+      const draw = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+          polygon: true,
+          rectangle: true,
+          trash: true
+        },
+        defaultMode: 'simple_select',
+        styles: [
+          // Custom styling for drawn areas
+          {
+            id: 'gl-draw-polygon-fill-inactive',
+            type: 'fill',
+            filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+            paint: {
+              'fill-color': '#16a34a',
+              'fill-outline-color': '#16a34a',
+              'fill-opacity': 0.1
+            }
+          },
+          {
+            id: 'gl-draw-polygon-stroke-inactive',
+            type: 'line',
+            filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+            layout: {
+              'line-cap': 'round',
+              'line-join': 'round'
+            },
+            paint: {
+              'line-color': '#16a34a',
+              'line-width': 2
+            }
+          },
+          {
+            id: 'gl-draw-polygon-fill-active',
+            type: 'fill',
+            filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+            paint: {
+              'fill-color': '#16a34a',
+              'fill-outline-color': '#16a34a',
+              'fill-opacity': 0.2
+            }
+          },
+          {
+            id: 'gl-draw-polygon-stroke-active',
+            type: 'line',
+            filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+            layout: {
+              'line-cap': 'round',
+              'line-join': 'round'
+            },
+            paint: {
+              'line-color': '#16a34a',
+              'line-width': 3
+            }
+          }
+        ]
+      });
+
+      map.addControl(draw, 'top-left');
+
+      // Handle drawing events
+      map.on('draw.create', (e) => {
+        setSelectedArea(e.features[0]);
+        setIsDrawing(false);
+      });
+
+      map.on('draw.update', (e) => {
+        setSelectedArea(e.features[0]);
+      });
+
+      map.on('draw.delete', () => {
+        setSelectedArea(null);
+        setRegionData(null);
+      });
+
+      map.on('draw.modechange', (e) => {
+        setIsDrawing(e.mode !== 'simple_select');
+      });
+
+      mapInstanceRef.current = map;
+      drawRef.current = draw;
+
+      return () => {
+        map.remove();
+      };
     }
   }, [coords]);
 
   const handleRegionAnalysis = async () => {
-    if (!coords) return;
+    if (!selectedArea) {
+      // If no area selected, analyze current location
+      if (!coords) return;
+      setAnalyzingRegion(true);
+      setRegionData(null);
+      try {
+        const result = await analyzeRegion(coords.lat, coords.lon, lang);
+        setRegionData(result);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setAnalyzingRegion(false);
+      }
+      return;
+    }
+
+    // Analyze selected area
     setAnalyzingRegion(true);
     setRegionData(null);
+    
     try {
-      const result = await analyzeRegion(coords.lat, coords.lon, lang);
-      setRegionData(result);
+      // Calculate centroid of selected area
+      const coordinates = selectedArea.geometry.coordinates[0];
+      const lats = coordinates.map((coord: number[]) => coord[1]);
+      const lngs = coordinates.map((coord: number[]) => coord[0]);
+      const centerLat = lats.reduce((a: number, b: number) => a + b, 0) / lats.length;
+      const centerLng = lngs.reduce((a: number, b: number) => a + b, 0) / lngs.length;
+      
+      // Calculate area in hectares (approximate)
+      const areaInSquareMeters = turf.area(selectedArea);
+      const areaInHectares = (areaInSquareMeters / 10000).toFixed(2);
+      
+      const result = await analyzeRegion(centerLat, centerLng, lang, selectedArea);
+      setRegionData({
+        ...result,
+        areaSize: `${areaInHectares} hectares`,
+        coordinates: `${centerLat.toFixed(4)}, ${centerLng.toFixed(4)}`
+      });
     } catch (e) {
       console.error(e);
     } finally {
       setAnalyzingRegion(false);
+    }
+  };
+
+  const handleDrawArea = () => {
+    if (drawRef.current) {
+      drawRef.current.changeMode('draw_polygon');
+      setIsDrawing(true);
+    }
+  };
+
+  const handleClearArea = () => {
+    if (drawRef.current) {
+      drawRef.current.deleteAll();
+      setSelectedArea(null);
+      setRegionData(null);
     }
   };
 
@@ -126,10 +278,32 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
       {/* Content Split: Map and Weather */}
       <div className="flex-1 flex flex-col">
         {/* Map Section */}
-        <div className="relative h-48 w-full bg-cement-100">
+        <div className="relative h-64 w-full bg-cement-100">
            <div ref={mapContainerRef} className="absolute inset-0 z-0" />
            
-           {/* Map Overlay Button */}
+           {/* Map Controls */}
+           <div className="absolute top-3 right-3 z-[400] flex flex-col gap-2">
+             <button 
+               onClick={handleDrawArea}
+               disabled={isDrawing}
+               className="bg-white text-cement-800 text-xs font-bold px-3 py-2 rounded-lg shadow-md border border-cement-200 flex items-center gap-2 hover:bg-green-50 hover:text-green-700 transition-colors disabled:opacity-70"
+             >
+               <Square className="w-3 h-3" />
+               {isDrawing ? 'Drawing...' : 'Select Area'}
+             </button>
+             
+             {selectedArea && (
+               <button 
+                 onClick={handleClearArea}
+                 className="bg-white text-red-600 text-xs font-bold px-3 py-2 rounded-lg shadow-md border border-cement-200 flex items-center gap-2 hover:bg-red-50 transition-colors"
+               >
+                 <Trash2 className="w-3 h-3" />
+                 Clear
+               </button>
+             )}
+           </div>
+           
+           {/* Analysis Button */}
            <button 
              onClick={handleRegionAnalysis}
              disabled={analyzingRegion}
@@ -140,7 +314,7 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
              ) : (
                <Satellite className="w-3 h-3" />
              )}
-             {analyzingRegion ? t('analyzingRegion') : t('analyzeRegion')}
+             {analyzingRegion ? t('analyzingRegion') : (selectedArea ? 'Analyze Area' : t('analyzeRegion'))}
            </button>
         </div>
 
@@ -148,9 +322,15 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
         {regionData && (
           <div className="bg-green-50 p-3 border-b border-green-100 animate-in fade-in slide-in-from-top-2">
             <h4 className="text-xs font-bold text-green-800 mb-2 uppercase flex items-center gap-1">
-              <Locate className="w-3 h-3" /> {t('regionAnalysis')}
+              <Locate className="w-3 h-3" /> {selectedArea ? 'Selected Area Analysis' : t('regionAnalysis')}
             </h4>
             <div className="grid grid-cols-2 gap-2 text-xs">
+              {regionData.areaSize && (
+                <div className="col-span-2 mb-1">
+                  <span className="text-green-600 font-medium block">Area Size</span>
+                  <span className="text-cement-700">{regionData.areaSize}</span>
+                </div>
+              )}
               <div>
                 <span className="text-green-600 font-medium block">{t('soilPotential')}</span>
                 <span className="text-cement-700">{regionData.soilPotential}</span>
@@ -158,6 +338,10 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
               <div>
                 <span className="text-green-600 font-medium block">{t('climate')}</span>
                 <span className="text-cement-700">{regionData.climateSuitability}</span>
+              </div>
+              <div className="col-span-2">
+                <span className="text-green-600 font-medium block">{t('water')}</span>
+                <span className="text-cement-700">{regionData.waterSources}</span>
               </div>
               <div className="col-span-2 mt-1 pt-1 border-t border-green-200">
                 <span className="font-bold text-green-900">Rating: {regionData.overallRating}</span>
