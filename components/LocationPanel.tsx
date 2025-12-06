@@ -8,8 +8,8 @@ import mapboxgl from 'mapbox-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import * as turf from '@turf/turf';
 
-// Set your Mapbox access token here
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY || 'pk.eyJ1IjoidG9tby1hY2FkZW15IiwiYSI6ImNtNDJhdGIyajByeGsya3M2NjZjNDl5a2sifQ.X1YgKzVZQJwDfvGdUVWGwQ';
+// Set your Mapbox access token here - using the token directly for now
+mapboxgl.accessToken = 'pk.eyJ1IjoidG9tby1hY2FkZW15IiwiYSI6ImNtNDJhdGIyajByeGsya3M2NjZjNDl5a2sifQ.X1YgKzVZQJwDfvGdUVWGwQ';
 
 interface LocationPanelProps {
   lang: Language;
@@ -65,13 +65,14 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
   // Initialize Mapbox Map
   useEffect(() => {
     if (coords && mapContainerRef.current && !mapInstanceRef.current) {
-      const map = new mapboxgl.Map({
-        container: mapContainerRef.current,
-        style: 'mapbox://styles/mapbox/satellite-streets-v12',
-        center: [coords.lon, coords.lat],
-        zoom: 14,
-        attributionControl: false
-      });
+      try {
+        const map = new mapboxgl.Map({
+          container: mapContainerRef.current,
+          style: 'mapbox://styles/mapbox/satellite-streets-v12',
+          center: [coords.lon, coords.lat],
+          zoom: 14,
+          attributionControl: false
+        });
 
       // Add navigation control
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -178,9 +179,13 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
       mapInstanceRef.current = map;
       drawRef.current = draw;
 
-      return () => {
-        map.remove();
-      };
+        return () => {
+          map.remove();
+        };
+      } catch (error) {
+        console.error('Map initialization failed:', error);
+        setError('Map loading failed');
+      }
     }
   }, [coords]);
 
@@ -279,7 +284,7 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
       <div className="flex-1 flex flex-col">
         {/* Map Section */}
         <div className="relative h-64 w-full bg-cement-100">
-           <div ref={mapContainerRef} className="absolute inset-0 z-0" />
+           <div ref={mapContainerRef} className=\"absolute inset-0 z-0 rounded-lg overflow-hidden\" style={{ minHeight: '256px' }} />
            
            {/* Map Controls */}
            <div className="absolute top-3 right-3 z-[400] flex flex-col gap-2">

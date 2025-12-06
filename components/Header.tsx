@@ -24,12 +24,22 @@ export const Header: React.FC<HeaderProps> = ({ currentLang, onLangChange }) => 
     <header className="sticky top-0 z-50 bg-white border-b border-cement-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-2">
-            <img 
-              src="/1000098217.png" 
-              alt="AgriVision AI Logo" 
-              className="w-8 h-8 rounded-lg"
-            />
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg overflow-hidden shadow-sm border border-cement-200">
+              <img 
+                src="./1000098217.png" 
+                alt="AgriVision AI Logo" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <div className="w-full h-full bg-green-600 rounded-lg flex items-center justify-center hidden">
+                <Leaf className="w-5 h-5 text-white" />
+              </div>
+            </div>
             <span className="text-xl font-bold text-cement-900 tracking-tight">{t('appTitle')}<span className="text-green-600">.AI</span></span>
           </div>
           

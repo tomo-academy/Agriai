@@ -90,7 +90,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ analysisContext, lang }) => {
         <div className="bg-green-600 p-4 rounded-t-2xl flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img 
-              src="/1000098217.png" 
+              src="./1000098217.png" 
               alt="AgriVision AI" 
               className="w-7 h-7 rounded-lg bg-white/10 p-0.5"
             />
@@ -139,13 +139,13 @@ export const ChatBot: React.FC<ChatBotProps> = ({ analysisContext, lang }) => {
         </div>
 
         {/* Input */}
-        <div className="border-t border-cement-100 bg-white rounded-b-2xl px-2 py-1">
+        <div className="border-t border-cement-100 bg-white rounded-b-2xl px-3 py-2">
           <AIInput
             placeholder={t('chatPlaceholder')}
             onSubmit={handleSend}
             className="py-0"
-            minHeight={40}
-            maxHeight={100}
+            minHeight={36}
+            maxHeight={80}
           />
         </div>
       </div>

@@ -37,15 +37,15 @@ export function AIInput({
   };
 
   return (
-    <div className={cn("w-full py-4", className)}>
-      <div className="relative max-w-xl w-full mx-auto">
+    <div className={cn("w-full py-2", className)}>
+      <div className="relative w-full">
         <Textarea
           id={id}
           placeholder={placeholder}
           className={cn(
-            "max-w-xl bg-cement-50 rounded-xl pl-4 pr-16",
-            "placeholder:text-cement-500",
-            "border border-cement-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20",
+            "w-full bg-cement-50 rounded-2xl pl-4 pr-12 shadow-sm",
+            "placeholder:text-cement-400 text-sm",
+            "border border-cement-200 focus:border-green-500 focus:ring-1 focus:ring-green-500/30",
             "text-cement-800 text-wrap",
             "overflow-y-auto resize-none",
             "focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -71,25 +71,25 @@ export function AIInput({
 
         <div
           className={cn(
-            "absolute top-1/2 -translate-y-1/2 rounded-lg bg-cement-100 p-1 transition-all duration-200",
-            inputValue ? "right-10" : "right-3"
+            "absolute top-1/2 -translate-y-1/2 rounded-lg bg-cement-100 p-1.5 transition-all duration-200",
+            inputValue ? "right-11" : "right-3"
           )}
         >
-          <Mic className="w-4 h-4 text-cement-500" />
+          <Mic className="w-3.5 h-3.5 text-cement-500" />
         </div>
        <button
   onClick={handleReset}
   type="button"
   className={cn(
-    "absolute top-1/2 -translate-y-1/2 right-3",
-    "rounded-lg bg-green-600 hover:bg-green-700 p-1",
-    "transition-all duration-200",
+    "absolute top-1/2 -translate-y-1/2 right-2",
+    "rounded-lg bg-green-600 hover:bg-green-700 p-1.5 shadow-sm",
+    "transition-all duration-200 hover:shadow-md",
     inputValue 
       ? "opacity-100 scale-100" 
       : "opacity-0 scale-95 pointer-events-none"
   )}
 >
-  <CornerRightUp className="w-4 h-4 text-white" />
+  <CornerRightUp className="w-3.5 h-3.5 text-white" />
 </button>
       </div>
     </div>
