@@ -7,6 +7,8 @@ import { SoilCrops } from './components/SoilCrops';
 import { FeatureGrid } from './components/FeatureGrid';
 import { ChatBot } from './components/ChatBot';
 import { Modal } from './components/Modal';
+import { Market } from './components/Market';
+import { Community } from './components/Community';
 import { analyzePlantImage, generateFeatureReport } from './services/geminiService';
 import { PlantAnalysis, FeaturePlaceholder, Language } from './types';
 import ReactMarkdown from 'react-markdown';
@@ -15,6 +17,7 @@ import { FileDown, FileJson, FileText } from 'lucide-react';
 import { getTranslation } from './utils/translations';
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'market' | 'community'>('dashboard');
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<PlantAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -153,11 +156,15 @@ export default function App() {
     doc.save(`AgriVision_${selectedFeature.id}.pdf`);
   };
 
-  return (
-    <div className="min-h-screen bg-cement-50 pb-20 font-sans text-cement-900">
-      <Header currentLang={lang} onLangChange={setLang} />
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'market':
+        return <Market lang={lang} />;
+      case 'community':
+        return <Community lang={lang} />;
+      default:
+        return (
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Top Grid: Upload/Preview + Weather/Results */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
           
@@ -202,7 +209,21 @@ export default function App() {
            <FeatureGrid onFeatureClick={handleFeatureClick} lang={lang} />
         </div>
 
-      </main>
+          </main>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-cement-50 pb-20 font-sans text-cement-900">
+      <Header 
+        currentLang={lang} 
+        onLangChange={setLang} 
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
+
+      {renderPage()}
 
       {/* Persistent ChatBot */}
       <ChatBot analysisContext={analysis} lang={lang} />

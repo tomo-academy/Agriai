@@ -6,9 +6,11 @@ import { getTranslation } from '../utils/translations';
 interface HeaderProps {
   currentLang: Language;
   onLangChange: (lang: Language) => void;
+  currentPage: 'dashboard' | 'market' | 'community';
+  onPageChange: (page: 'dashboard' | 'market' | 'community') => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentLang, onLangChange }) => {
+export const Header: React.FC<HeaderProps> = ({ currentLang, onLangChange, currentPage, onPageChange }) => {
   const languages: { code: Language; label: string }[] = [
     { code: 'en', label: 'English' },
     { code: 'hi', label: 'हिंदी' },
@@ -44,10 +46,31 @@ export const Header: React.FC<HeaderProps> = ({ currentLang, onLangChange }) => 
           </div>
           
           <nav className="hidden md:flex space-x-8">
-            <a href="#" className="text-cement-900 font-medium hover:text-green-600 transition-colors">{t('dashboard')}</a>
+            <button 
+              onClick={() => onPageChange('dashboard')}
+              className={`font-medium transition-colors ${
+                currentPage === 'dashboard' ? 'text-cement-900' : 'text-cement-500 hover:text-green-600'
+              }`}
+            >
+              {t('dashboard')}
+            </button>
             <a href="#" className="text-cement-500 font-medium hover:text-green-600 transition-colors">{t('myCrops')}</a>
-            <a href="#" className="text-cement-500 font-medium hover:text-green-600 transition-colors">{t('market')}</a>
-            <a href="#" className="text-cement-500 font-medium hover:text-green-600 transition-colors">{t('community')}</a>
+            <button 
+              onClick={() => onPageChange('market')}
+              className={`font-medium transition-colors ${
+                currentPage === 'market' ? 'text-cement-900' : 'text-cement-500 hover:text-green-600'
+              }`}
+            >
+              {t('market')}
+            </button>
+            <button 
+              onClick={() => onPageChange('community')}
+              className={`font-medium transition-colors ${
+                currentPage === 'community' ? 'text-cement-900' : 'text-cement-500 hover:text-green-600'
+              }`}
+            >
+              {t('community')}
+            </button>
           </nav>
 
           <div className="flex items-center gap-4">

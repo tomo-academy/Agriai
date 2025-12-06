@@ -284,7 +284,7 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({ lang }) => {
       <div className="flex-1 flex flex-col">
         {/* Map Section */}
         <div className="relative h-64 w-full bg-cement-100">
-           <div ref={mapContainerRef} className=\"absolute inset-0 z-0 rounded-lg overflow-hidden\" style={{ minHeight: '256px' }} />
+           <div ref={mapContainerRef} className="absolute inset-0 z-0 rounded-lg overflow-hidden" style={{ minHeight: '256px' }} />
            
            {/* Map Controls */}
            <div className="absolute top-3 right-3 z-[400] flex flex-col gap-2">
